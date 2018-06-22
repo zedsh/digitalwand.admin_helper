@@ -25,7 +25,8 @@ Loc::loadMessages(__FILE__);
 class ComboBoxWidget extends HelperWidget
 {
     static protected $defaults = array(
-        'EDIT_IN_LIST' => true
+        'EDIT_IN_LIST' => true,
+        'EMPTY_ROW' => true
     );
 
     /**
@@ -70,7 +71,9 @@ class ComboBoxWidget extends HelperWidget
 
         $variants = $this->getVariants();
 
-        if (!$multiple)
+
+        $empty_row = $this->getSettings('EMPTY_ROW');
+        if (!$multiple && $empty_row)
         {
             array_unshift($variants, array(
                 'ID' => null,
