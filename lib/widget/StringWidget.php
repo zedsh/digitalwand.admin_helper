@@ -25,7 +25,8 @@ class StringWidget extends HelperWidget
 {
     static protected $defaults = array(
         'FILTER' => '%', //Фильтрация по подстроке, а не по точному соответствию.
-        'EDIT_IN_LIST' => true
+        'EDIT_IN_LIST' => true,
+        'CUSTOM_JS' => false
     );
 
     /**
@@ -57,11 +58,13 @@ class StringWidget extends HelperWidget
             $link = '<image id="' . $nameId . '" title="' . Loc::getMessage("IBSEC_E_LINK_TIP") . '" class="linked" src="/bitrix/themes/.default/icons/iblock/link.gif" onclick="' . $linkedFunctionName . '()" />';
         }
 
+        $custom_js = $this->getSettings('CUSTOM_JS');
+
         return '<input type="text"
                        name="' . $this->getEditInputName() . '"
                        value="' . static::prepareToTagAttr($this->getValue()) . '"
                        size="' . $size . '"
-                       style="' . $style . '"/>' . $link;
+                       style="' . $style . '"/>' . ($custom_js ? $custom_js : '') . $link;
     }
 
     protected function getMultipleEditHtml()

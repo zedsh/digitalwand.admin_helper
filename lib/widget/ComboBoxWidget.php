@@ -26,8 +26,60 @@ class ComboBoxWidget extends HelperWidget
 {
     static protected $defaults = array(
         'EDIT_IN_LIST' => true,
-        'EMPTY_ROW' => true
+        'EMPTY_ROW' => true,
+        'WITH_FILTER' => false
     );
+
+    protected function jsHelper()
+    {
+        if($this->jsHelper)
+            return true;
+        parent::jsHelper();
+
+        ?>
+        <script>
+            jQuery.fn.filterByText = function (textbox, selectSingleMatch) {
+                return this.each(function () {
+                    var select = this;
+                    var options = [];
+                    $(select).find('option').each(function () {
+                        options.push({value: $(this).val(), text: $(this).text()});
+                    });
+                    $(select).data('options', options);
+                    $(textbox).bind('change keyup', function () {
+                        var current = $(select).val();
+                        var options = $(select).empty().scrollTop(0).data('options');
+                        var search = $.trim($(this).val());
+                        var regex = new RegExp(search, 'gi');
+
+                        $.each(options, function (i) {
+                            var option = options[i];
+                            if (option.text.match(regex) !== null || option.value === current) {
+                                $(select).append(function() {
+                                        if (option.value === current) {
+                                            return $('<option selected="">').text(option.text).val(option.value);
+                                        } else {
+                                            return $('<option>').text(option.text).val(option.value);
+                                        }
+                                    }()
+                                );
+                            }
+                        });
+                        if (selectSingleMatch === true &&
+                            $(select).children().length === 1) {
+                            $(select).children().get(0).selected = true;
+                        }
+                    });
+
+                    if($.trim(textbox.val()).length !== 0){
+                        textbox.change();
+                    }
+                });
+            };
+        </script>
+        <?
+
+    }
 
     /**
      * @inheritdoc
@@ -73,20 +125,30 @@ class ComboBoxWidget extends HelperWidget
 
 
         $empty_row = $this->getSettings('EMPTY_ROW');
-        if (!$multiple && $empty_row)
-        {
+        if (!$multiple && $empty_row) {
             array_unshift($variants, array(
                 'ID' => null,
                 'TITLE' => null
             ));
         }
 
+
         if (empty($variants)) {
             $comboBox = Loc::getMessage('DIGITALWAND_AH_MISSING_VARIANTS');
         } else {
             $name = $forFilter ? $this->getFilterInputName() : $this->getEditInputName();
-            $comboBox = '<select name="' . $name . ($multiple ? '[]' : null) . '"
-                '. ($multiple ? 'multiple="multiple"' : null) . '
+            $filter_list = $this->getSettings('WITH_FILTER');
+            $filter_name = $this->getEditId("_FILTER");
+            $comboBox = '';
+
+            if ($filter_list) {
+               $comboBox .= "<input id='" . $filter_name . "' type='text' placeholder='Поиск по полю'/><br>";
+            }
+
+
+            $edit_id = $this->getEditId();
+            $comboBox .= '<select name="' . $name . ($multiple ? '[]' : null) . '"
+                ' . ($multiple ? 'multiple="multiple"' : null) . " id='$edit_id'" . ($filter_list ? " size='4' " : "") . '
                 style="' . $style . '">';
 
             foreach ($variants as $variant) {
@@ -107,6 +169,11 @@ class ComboBoxWidget extends HelperWidget
             }
 
             $comboBox .= '</select>';
+
+            if($filter_list)
+            {
+                $comboBox .= "<script> $('#' + '$edit_id').filterByText($('#' + '$filter_name'), false); </script>";
+                            }
         }
 
         return $comboBox;
@@ -156,7 +223,7 @@ class ComboBoxWidget extends HelperWidget
      *      '789' => array('ID' => 789, 'TITLE' => 'pish-pish'),
      * )
      * </code>
-     * 
+     *
      * Результат будет выводиться в комбобоксе.
      * @return array
      */
@@ -170,7 +237,7 @@ class ComboBoxWidget extends HelperWidget
             if (is_array($var)) {
                 return $this->formatVariants($var);
             }
-        }elseif (is_array($variants) AND !empty($variants)) {
+        } elseif (is_array($variants) AND !empty($variants)) {
             return $this->formatVariants($variants);
         }
 

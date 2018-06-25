@@ -797,6 +797,12 @@ abstract class HelperWidget
         return 'FIELDS[' . $this->getCode() . $suffix . ']';
     }
 
+
+    protected function getEditId($suffix = null)
+    {
+        return 'ID_' . $this->getCode() . $suffix;
+    }
+
     /**
      * Уникальный ID для DOM HTML
      * @return string
