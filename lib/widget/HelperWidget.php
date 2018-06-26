@@ -245,7 +245,7 @@ abstract class HelperWidget
             print '<tr>';
             $title = $this->getSettings('TITLE');
             if ($this->getSettings('REQUIRED') === true) {
-                $title = '<b>' . $title . '</b>';
+                $title = '<b>' . $title . '<span style="color:red"> *</span></b>';
             }
             print '<td width="40%" style="vertical-align: top;">' . $title . ':</td>';
 

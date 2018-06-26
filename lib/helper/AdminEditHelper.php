@@ -53,6 +53,11 @@ abstract class AdminEditHelper extends AdminBaseHelper
 	 */
 	protected $tabControl;
 
+	public function showFinalScript()
+    {
+        echo '';
+    }
+
 	/**
 	 * Производится инициализация переменных, обработка запросов на редактирование
 	 *
@@ -284,6 +289,7 @@ abstract class AdminEditHelper extends AdminBaseHelper
 
 		$this->tabControl->BeginEpilogContent();
 		$this->showEpilog();
+		$this->showFinalScript();
 		$this->tabControl->EndEpilogContent();
 
 		$query = $this->additionalUrlParams;
