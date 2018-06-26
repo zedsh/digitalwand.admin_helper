@@ -54,7 +54,7 @@ class ComboBoxWidget extends HelperWidget
 
                         $.each(options, function (i) {
                             var option = options[i];
-                            if (option.text.match(regex) !== null || option.value === current) {
+                            if (option.text.match(regex) !== null || option.value === current || option.value === '') {
                                 $(select).append(function() {
                                         if (option.value === current) {
                                             return $('<option selected="">').text(option.text).val(option.value);
